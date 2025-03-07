@@ -3,51 +3,61 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
     container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1
     },
     formContainer: {
-    width: '80%',
-    padding: 20,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    backgroundColor: 'rgba(255,255,255,0.9)'
     },
     title: {
     color: '#333',
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 24,
+    marginTop: 20,
     textAlign: 'center',
     },
     input: {
     height: 48,
-    backgroundColor: 'white',
+    backgroundColor: "#F2F2F2",
     borderRadius: 8,
     paddingHorizontal: 16,
     marginBottom: 16,
     fontSize: 16,
-    color: '#333',
+    width: '80%',
+    alignSelf: 'center',
+    color: '#F6F6F6',
     },
     button: {
     height: 48,
-    width: '100%',
-    borderRadius: 8,
+    width: '80%',
+    borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 24,
-    color:'#235427'
+    alignSelf: 'center',
+    backgroundColor: "#235427"
     },
+    buttonRegister: {
+        height: 48,
+        alignSelf: 'center',
+        width: '80%',
+        borderRadius: 32,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 24,
+        backgroundColor: "#D8E593CC"
+        },
     buttonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "600",
     },
+
+    buttonRegisterText: {
+        color: '#222222B2',
+        fontSize: 18,
+        fontWeight: "600",
+        },
     error: {
     color: '#f00',
     marginBottom: 12,
@@ -57,12 +67,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
     },
     footerText: {
-    color: '#666',
+    color: '#222222',
     fontSize: 14,
     textAlign: 'center',
     },
     link: {
-    color: '#4c6ef5',
+    color: '#E8B536',
     fontWeight: 'bold',
     }
    });

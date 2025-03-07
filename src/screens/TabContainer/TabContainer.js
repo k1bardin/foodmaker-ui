@@ -37,6 +37,10 @@ function CategoriesStack() {
     headerShown: false,
     headerBackVisible: false
   })} />
+  <Stack.Screen name="Регистрация" component={RegisterScreen} options={() => ({
+    headerShown: false,
+    headerBackVisible: false
+  })} />
   </Stack.Navigator>
   );
  }

@@ -6,7 +6,8 @@ import {
     Text, 
     TextInput, 
     TouchableOpacity,
-    ActivityIndicator
+    ActivityIndicator,
+    ScrollView
 } from 'react-native';
 
 export default function LoginScreen(props) {
@@ -51,7 +52,7 @@ export default function LoginScreen(props) {
 
     return (
         <View style={styles.container}>
-        <View style={styles.formContainer}>
+        <ScrollView style={styles.formContainer}>
         <Text style={styles.title}>Войти в аккаунт</Text>
        
         {error && (
@@ -85,19 +86,21 @@ export default function LoginScreen(props) {
         <Text style={styles.buttonText}>Войти</Text>
         )}
         </TouchableOpacity>
-       
-        <View style={styles.footer}>
-        <Text style={styles.footerText}>
-        Ещё нет аккаунта? 
-        <Text 
-        style={[styles.footerText, styles.link]}
-        onPress={() => console.log('Регистрация')}
+
+        <TouchableOpacity
+        style={styles.buttonRegister}
+        onPress={navigation.navigate('Регистрация')}
+        disabled={loading}
         >
-        Зарегистрироваться
-        </Text>
-        </Text>
-        </View>
-        </View>
+        {loading ? (
+        <ActivityIndicator size="small" color="#fff" />
+        ) : (
+        <Text style={styles.buttonRegisterText}>Зарегистрироваться</Text>
+        )}
+        </TouchableOpacity>
+       
+
+        </ScrollView>
         </View>
         );
        };
