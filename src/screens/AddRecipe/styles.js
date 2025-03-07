@@ -1,0 +1,123 @@
+import { 
+    StyleSheet, 
+    Dimensions } from 'react-native';
+
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            padding: 16,
+            backgroundColor: 'white',
+        },
+        title: {
+            fontSize: 18,
+            fontWeight: "600",
+            fontFamily: "Source Sans Pro",
+            marginBottom: 16,
+        },
+        selector: {
+            backgroundColor: '#f5f5f5',
+            padding: 12,
+            borderRadius: 8,
+        },
+        selectorText: {
+            fontSize: 16,
+            opacity:0.22
+        },
+        modalContent: {
+            flex: 1,
+            maxHeight: '80%',
+            backgroundColor: 'white',
+            padding: 16,
+            borderRadius: 8,
+        },
+        searchContainer: {
+            marginBottom: 16,
+            marginTop: 10,
+        },
+        searchInput: {
+            height: 40,
+            paddingHorizontal: 12,
+            borderWidth: 1,
+borderColor: "rgba(246, 246, 246, 1.0)",
+            borderRadius: 8,
+            backgroundColor: "#F2F2F2",
+            opacity: 0.98,
+            fontSize: 16,
+        },
+        input: {
+            height: 40,
+            paddingHorizontal: 12,
+            borderWidth: 1,
+borderColor: "rgba(246, 246, 246, 1.0)",
+            borderRadius: 8,
+            backgroundColor: "#F2F2F2",
+            opacity: 0.98,
+            fontSize: 16,
+            marginBottom:15
+            
+        },
+        ingredientList: {
+            flex: 1,
+            maxHeight: '75%', // Ограничиваем высоту списка
+            marginBottom: 16, // Добавляем отступ снизу
+        },
+        ingredientItem: {
+            paddingVertical: 8,
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+        },
+        checkboxContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+        ingredientText: {
+            fontSize: 16,
+        },
+        checkedText: {
+            color: 'green',
+            fontSize: 16,
+            marginLeft: 8,
+        },
+        doneButton: {
+            backgroundColor: '#235427',
+            paddingVertical: 12,
+            alignSelf: 'stretch',
+            marginTop: 16,
+            borderRadius: 32,
+        },
+        doneText: {
+            color: 'white',
+            fontSize: 16,
+            textAlign: 'center',
+            fontWeight: 'bold',
+        },
+        addStep: {
+            width: 120,
+            height: 20,
+fontFamily: "Source Sans Pro",
+fontSize: 16,
+fontWeight: "600",
+fontStyle: "normal",
+lineHeight: 24,
+color: "#E8B536",
+        },
+        quantityInput: {
+            height: 30,
+            width: 80,
+            borderWidth: 1,
+            borderColor: '#ddd',
+            borderRadius: 5,
+            paddingLeft: 10,
+            marginRight: 5,
+            fontSize: 16,
+            
+            backgroundColor: '#fff',
+            marginLeft: 15
+          }
+    });
+    
+
+export default styles;
