@@ -1,19 +1,10 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  ScrollView,
-  Image,
-  Alert
-} from "react-native";
-import MultiSelect from "react-native-multiple-select";
+import { View, Text, TextInput, ScrollView, Image } from "react-native";
 import Slider from "@react-native-community/slider";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Modal from "react-native-modal";
 import styles from "./styles";
-import trashIcon from '../../../assets/icons/trash.png'
+import trashIcon from "../../../assets/icons/trash.png";
 
 const AddRecipeScreen = () => {
   const [recipeTitle, setRecipeTitle] = useState("");
@@ -21,7 +12,7 @@ const AddRecipeScreen = () => {
   const [recipeHoliday, setRecipeHoliday] = useState("");
   const [recipeCountry, setRecipeCountry] = useState("");
   const [time, setTime] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [ingredients, setIngredients] = useState([]);
   const [categories, setCategories] = useState([]);
   const [countries, setCountries] = useState([]);
@@ -30,10 +21,18 @@ const AddRecipeScreen = () => {
   const [ingredientQuantities, setIngredientQuantities] = useState({});
   const [steps, setSteps] = useState([{ stepNumber: 1, stepDescription: "" }]);
   const [selectedIngredients, setSelectedIngredients] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedTypeMeal, setSelectedTypeMeal] = useState(null);
+  const [selectedHoliday, setSelectedHoliday] = useState(null);
   const [activeInput, setActiveInput] = useState(null);
+  
 
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [ingredientsModalVisible, setIngredientsModalVisible] = useState(false);
+  const [countriesModalVisible, setCountriesModalVisible] = useState(false);
+  const [typeMealsModalVisible, setTypeMealsModalVisible] = useState(false);
+  const [holidaysModalVisible, setholidaysModalVisible] = useState(false);
   const [isCategoriesModalVisible, setCategoriesModalVisible] = useState(false);
 
   const handleCategoryPress = (item) => {
@@ -45,27 +44,37 @@ const AddRecipeScreen = () => {
 
   const handleIngredientPress = (item) => {
     if (selectedIngredients.includes(item.value)) {
-      setSelectedIngredients(selectedIngredients.filter(i => i !== item.value));
-      setIngredientQuantities(prev => ({
+      setSelectedIngredients(
+        selectedIngredients.filter((i) => i !== item.value)
+      );
+      setIngredientQuantities((prev) => ({
         ...prev,
-        [item.value]: ''
+        [item.value]: "",
       }));
     } else {
       setSelectedIngredients([...selectedIngredients, item.value]);
     }
   };
 
+  const handleCountryPress = (item) => {
+    setCountriesModalVisible(false);
+
+    // Сохраняем выбранную страну
+    setSelectedCountry(item.value);
+  };
+
   const handleQuantityChange = (ingredientValue, quantity) => {
-    setIngredientQuantities(prev => ({
+    setIngredientQuantities((prev) => ({
       ...prev,
-      [ingredientValue]: quantity
+      [ingredientValue]: quantity,
     }));
   };
 
   const filteredIngredients = ingredients
-    .filter(item => 
-      item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      selectedIngredients.includes(item.value)
+    .filter(
+      (item) =>
+        item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        selectedIngredients.includes(item.value)
     )
     .sort((a, b) => {
       const aSelected = selectedIngredients.includes(a.value);
@@ -74,6 +83,7 @@ const AddRecipeScreen = () => {
       if (!aSelected && bSelected) return 1;
       return a.label.localeCompare(b.label);
     });
+
 
 
   const removeIngredient = (ingredient) => {
@@ -187,21 +197,23 @@ const AddRecipeScreen = () => {
       stepDescription: step.stepDescription,
     }));
 
-    const formattedCategories = selectedCategories.map((item) => ({
-      categoryId: item.value,
-    }));
+    const attributes = [
+      {
+        countryId: selectedCountry,
+        categoryId: selectedCategory,
+        holidayId: selectedHoliday,
+        typeMealId: selectedTypeMeal
+      }
+    ];
 
     const recipeData = {
       recipeTitle,
-      recipeCountry,
-      recipeHoliday,
-      progress: null,
-      typeMeal,
-      time: `${time} минут`,
+      time: `${cookTime} минут`,
       imageLink: null,
+      imageLinkPreview: null,
       ingredients: formattedIngredients,
       steps: formattedSteps,
-      categories: formattedCategories,
+      attributes
     };
 
     try {
@@ -251,7 +263,7 @@ const AddRecipeScreen = () => {
 
   return (
     <ScrollView>
-      <View 
+      <View
         style={{
           flex: 1,
           padding: 16,
@@ -260,17 +272,14 @@ const AddRecipeScreen = () => {
         }}
       >
         <Text style={styles.title}>Название рецепта</Text>
-        <TextInput 
+        <TextInput
           value={recipeTitle}
           onChangeText={setRecipeTitle}
           placeholder="Введите название рецепта"
-           style={styles.input}
+          style={styles.input}
         />
 
-
-        <Text style={styles.title}>
-          Время приготовления
-        </Text>
+        <Text style={styles.title}>Время приготовления</Text>
         <View
           style={{
             flexDirection: "row",
@@ -283,94 +292,98 @@ const AddRecipeScreen = () => {
             style={{ width: "70%" }}
             minimumValue={0}
             maximumValue={120}
-            trackStyle={{
-              backgroundColor: '#235427'
-            }}
+            minimumTrackTintColor="#235427"
             step={1}
             value={time}
             onValueChange={setTime}
           />
         </View>
 
+        <View
+          style={{
+            marginBottom: 16,
+          }}
+        >
+          <Text style={styles.title}>Ингредиенты</Text>
 
-<View style={{
-              marginBottom: 16,
-            }}>
-      <Text style={styles.title}>Ингредиенты</Text>
-
-      <TouchableOpacity
-        style={styles.selector}
-        onPress={() => setIngredientsModalVisible(true)}
-      >
-        <Text style={styles.selectorText}>
-          {selectedIngredients.length > 0
-            ? selectedIngredients
-                .map(cat => 
-                  ingredients.find(i => i.value === cat)?.label || cat
-                )
-                .join(', ')
-            : 'Выберите ингредиенты'}
-        </Text>
-      </TouchableOpacity>
-
-      {/* Модальное окно с ингредиентами */}
-      <Modal
-        isVisible={ingredientsModalVisible}
-        onBackdropPress={() => setIngredientsModalVisible(false)}
-      >
-        <View style={styles.modalContent}>
-          {/* Поле поиска */}
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Поиск"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-
-          {/* Список ингредиентов */}
-          <ScrollView style={styles.ingredientList}>
-            {filteredIngredients.map(item => (
-              <TouchableOpacity
-                key={item.value}
-                style={styles.ingredientItem}
-                onPress={() => handleIngredientPress(item)}
-              >
-                <View style={styles.checkboxContainer}>
-                  <Text style={styles.ingredientText}>{item.label}</Text>
-                  {selectedIngredients.includes(item.value) && (
-                    <Text style={styles.checkedText}>(✓)</Text>
-                  )&& (
-                    <View style={styles.quantityContainer}>
-                      <TextInput
-                        style={styles.quantityInput}
-                        value={ingredientQuantities[item.value] || ''}
-                        onChangeText={(text) => handleQuantityChange(item.value, text)}
-                        placeholder="Кол-во"
-                        required
-                      />
-                    </View>
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          {/* Кнопка "Готово" */}
           <TouchableOpacity
-            style={styles.doneButton}
-            onPress={() => setIngredientsModalVisible(false)}
+            style={styles.selector}
+            onPress={() => setIngredientsModalVisible(true)}
           >
-            <Text style={styles.doneText}>Готово</Text>
+            <Text style={styles.selectorText}>
+              {selectedIngredients.length > 0
+                ? selectedIngredients
+                    .map(
+                      (cat) =>
+                        ingredients.find((i) => i.value === cat)?.label || cat
+                    )
+                    .join(", ")
+                : "Выберите ингредиенты"}
+            </Text>
           </TouchableOpacity>
-        </View>
-      </Modal>
-    </View>
 
-        <View style={{
-              marginBottom: 16,
-            }} >
+          {/* Модальное окно с ингредиентами */}
+          <Modal
+            isVisible={ingredientsModalVisible}
+            onBackdropPress={() => setIngredientsModalVisible(false)}
+          >
+            <View style={styles.modalContentIngredients}>
+              {/* Поле поиска */}
+              <View style={styles.searchContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Поиск"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </View>
+
+              {/* Список ингредиентов */}
+              <ScrollView style={styles.ingredientList}>
+                {filteredIngredients.map((item) => (
+                  <TouchableOpacity
+                    key={item.value}
+                    style={styles.ingredientItem}
+                    onPress={() => handleIngredientPress(item)}
+                  >
+                    <View style={styles.checkboxContainer}>
+                      <Text style={styles.ingredientText}>{item.label}</Text>
+                      {selectedIngredients.includes(item.value) && (
+                          <Text style={styles.checkedText}>(✓)</Text>
+                        ) && (
+                          <View style={styles.quantityContainer}>
+                            <TextInput
+                              style={styles.quantityInput}
+                              value={ingredientQuantities[item.value] || ""}
+                              onChangeText={(text) =>
+                                handleQuantityChange(item.value, text)
+                              }
+                              placeholder="Кол-во"
+                              required
+                            />
+                          </View>
+                        )}
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              {/* Кнопка "Готово" */}
+              <TouchableOpacity
+                style={styles.doneButton}
+                onPress={() => setIngredientsModalVisible(false)}
+              >
+                <Text style={styles.doneText}>Готово</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+        </View>
+
+        <View
+          style={{
+            marginBottom: 16,
+          }}
+        >
           <Text style={styles.title}>Категории</Text>
 
           <TouchableOpacity
@@ -409,31 +422,86 @@ const AddRecipeScreen = () => {
             </View>
           )}
 
-          <Modal key="CategoeriesModal"
+          <Modal
+            key="CategoeriesModal"
             isVisible={isCategoriesModalVisible}
             onBackdropPress={() => setCategoriesModalVisible(false)}
           >
-            <View style={styles.modalContent}>
-              {categories
-                .filter((item) => item.label !== "Мои рецепты")
-                .map((item) => (
-                  <TouchableOpacity
-                    key={item.value}
-                    style={styles.modalItem}
-                    onPress={() => handleCategoryPress(item)}
-                  >
-                    <Text style={styles.modalText}>
-                      {item.label}
-                      {selectedCategories.includes(item.value) && " (✓)"}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+            <View style={styles.modalContentCategories}>
+              <ScrollView style={styles.categoryList}>
+                {categories
+                  .filter((item) => item.label !== "Мои рецепты")
+                  .map((item) => (
+                    <TouchableOpacity
+                      key={item.value}
+                      style={styles.categoryItem}
+                      onPress={() => handleCategoryPress(item)}
+                    >
+                      <Text style={styles.modalText}>
+                        {item.label}
+                        {selectedCategories.includes(item.value) && " (✓)"}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
               <TouchableOpacity
                 style={styles.doneButton}
                 onPress={() => setCategoriesModalVisible(false)}
               >
                 <Text style={styles.doneText}>Готово</Text>
               </TouchableOpacity>
+            </View>
+          </Modal>
+        </View>
+
+        <View style={{ marginBottom: 16 }}>
+          <Text style={styles.title}>Страна</Text>
+
+          <TouchableOpacity
+            style={styles.selector}
+            onPress={() => setCountriesModalVisible(true)}
+          >
+            <Text style={styles.selectorText}>
+              {selectedCountry
+                ? countries.find((c) => c.value === selectedCountry)?.label
+                : "Выберите страну"}
+            </Text>
+          </TouchableOpacity>
+
+          <Modal
+            isVisible={countriesModalVisible}
+            onBackdropPress={() => setCountriesModalVisible(false)}
+          >
+            <View style={styles.modalContentCountries}>
+              <View style={styles.searchContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Поиск"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </View>
+
+              <ScrollView style={styles.countriesList}>
+                {countries
+                  .filter((item) =>
+                    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((item) => (
+                    <TouchableOpacity
+                      key={item.value}
+                      style={styles.countryItem}
+                      onPress={() => handleCountryPress(item)}
+                    >
+                      <View style={styles.checkboxContainer}>
+                        <Text style={styles.countryText}>{item.label}</Text>
+                        {selectedCountry === item.value && (
+                          <Text style={styles.checkedText}>(✓)</Text>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
             </View>
           </Modal>
         </View>
@@ -449,21 +517,28 @@ const AddRecipeScreen = () => {
             }}
           >
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 14, marginBottom: 4, width: 70,
-marginBottom:8,
-borderRadius: 8, width: 52,
-height: 24,
-fontFamily: "Source Sans Pro",
-fontSize: 14,
-fontWeight: "600",
-fontStyle: "normal",
-lineHeight: 24,
-textAlign: "center",
-backgroundColor: "#F2F2F2" }}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  marginBottom: 4,
+                  width: 70,
+                  marginBottom: 8,
+                  borderRadius: 8,
+                  width: 52,
+                  height: 24,
+                  fontFamily: "Source Sans Pro",
+                  fontSize: 14,
+                  fontWeight: "600",
+                  fontStyle: "normal",
+                  lineHeight: 24,
+                  textAlign: "center",
+                  backgroundColor: "#F2F2F2",
+                }}
+              >
                 Этап {step.stepNumber}
               </Text>
               <TextInput
-              placeholder="Опишите этап приготовления"
+                placeholder="Опишите этап приготовления"
                 value={step.stepDescription}
                 onChangeText={(text) => {
                   const newSteps = [...steps];
@@ -477,27 +552,30 @@ backgroundColor: "#F2F2F2" }}>
               onPress={() => removeStep(index)}
               style={{ padding: 8 }}
             >
-              <Image source={trashIcon} style={{marginTop:10, width: 24, height: 24, opacity:0.5 }} />
+              <Image
+                source={trashIcon}
+                style={{ marginTop: 10, width: 24, height: 24, opacity: 0.5 }}
+              />
             </TouchableOpacity>
           </View>
         ))}
 
+        <TouchableOpacity onPress={addStep} style={styles.addStep}>
+          <Text
+            style={{
+              color: "#E8B536",
+              fontWeight: "600",
+              fontSize: 16,
+              textAlign: "center",
+            }}
+          >
+            Добавить этап
+          </Text>
+        </TouchableOpacity>
 
-<TouchableOpacity
-  onPress={addStep}
-  style={styles.addStep}
->
-  <Text style={{color: '#E8B536', fontWeight: "600", fontSize: 16, textAlign: 'center' }}>
-    Добавить этап 
-  </Text>
-</TouchableOpacity>
-
-<TouchableOpacity
-                style={styles.doneButton}
-                onPress={saveRecipe}
-              >
-                <Text style={styles.doneText}>Сохранить рецепт</Text>
-              </TouchableOpacity>
+        <TouchableOpacity style={styles.doneButton} onPress={saveRecipe}>
+          <Text style={styles.doneText}>Сохранить рецепт</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );

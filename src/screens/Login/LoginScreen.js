@@ -18,6 +18,10 @@ export default function LoginScreen(props) {
     const [error, setError] = useState(null);
     const { setUser } = useAuth();
 
+    const handleRegisterPress = () => {
+        navigation.navigate('Register');
+        };
+
     const handleLogin = async () => {
         try {
             setLoading(true);
@@ -42,7 +46,7 @@ export default function LoginScreen(props) {
             setUser(userData);
 
             console.log('Авторизация успешна');
-            navigation.navigate('Категории');
+            navigation.navigate('Home');
         } catch (err) {
             setError(err.message);
         } finally {
@@ -89,8 +93,8 @@ export default function LoginScreen(props) {
 
         <TouchableOpacity
         style={styles.buttonRegister}
-        onPress={navigation.navigate('Регистрация')}
         disabled={loading}
+        onPress={handleRegisterPress}
         >
         {loading ? (
         <ActivityIndicator size="small" color="#fff" />
