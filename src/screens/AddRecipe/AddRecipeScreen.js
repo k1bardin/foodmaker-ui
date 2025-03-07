@@ -3,10 +3,15 @@ import { View, Text, TextInput, ScrollView, Image } from "react-native";
 import Slider from "@react-native-community/slider";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Modal from "react-native-modal";
+import { useAuth  } from "../../services/AuthContext";
 import styles from "./styles";
 import trashIcon from "../../../assets/icons/trash.png";
 
-const AddRecipeScreen = () => {
+
+export default function AddRecipeScreen (props) {
+
+  const { user } = useAuth();
+  const { navigation, route } = props;
   const [recipeTitle, setRecipeTitle] = useState("");
   const [typeMeal, setTypeMeal] = useState("");
   const [recipeHoliday, setRecipeHoliday] = useState("");
@@ -16,7 +21,7 @@ const AddRecipeScreen = () => {
   const [ingredients, setIngredients] = useState([]);
   const [categories, setCategories] = useState([]);
   const [countries, setCountries] = useState([]);
-  const [typeMels, setTypeMeals] = useState([]);
+  const [typeMeals, setTypeMeals] = useState([]);
   const [holidays, setHolidays] = useState([]);
   const [ingredientQuantities, setIngredientQuantities] = useState({});
   const [steps, setSteps] = useState([{ stepNumber: 1, stepDescription: "" }]);
@@ -26,20 +31,17 @@ const AddRecipeScreen = () => {
   const [selectedTypeMeal, setSelectedTypeMeal] = useState(null);
   const [selectedHoliday, setSelectedHoliday] = useState(null);
   const [activeInput, setActiveInput] = useState(null);
-  
 
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [ingredientsModalVisible, setIngredientsModalVisible] = useState(false);
   const [countriesModalVisible, setCountriesModalVisible] = useState(false);
   const [typeMealsModalVisible, setTypeMealsModalVisible] = useState(false);
-  const [holidaysModalVisible, setholidaysModalVisible] = useState(false);
-  const [isCategoriesModalVisible, setCategoriesModalVisible] = useState(false);
+  const [holidaysModalVisible, setHolidaysModalVisible] = useState(false);
+  const [categoriesModalVisible, setCategoriesModalVisible] = useState(false);
 
   const handleCategoryPress = (item) => {
-    const newSelected = selectedCategories.includes(item.value)
-      ? selectedCategories.filter((cat) => cat !== item.value)
-      : [...selectedCategories, item.value];
-    setSelectedCategories(newSelected);
+    setCategoriesModalVisible(false);
+    setSelectedCategory(item.value);
   };
 
   const handleIngredientPress = (item) => {
@@ -58,9 +60,17 @@ const AddRecipeScreen = () => {
 
   const handleCountryPress = (item) => {
     setCountriesModalVisible(false);
-
-    // Сохраняем выбранную страну
     setSelectedCountry(item.value);
+  };
+
+  const handleTypeMealPress = (item) => {
+    setTypeMealsModalVisible(false);
+    setSelectedTypeMeal(item.value);
+  };
+
+  const handleHolidayPress = (item) => {
+    setHolidaysModalVisible(false);
+    setSelectedHoliday(item.value);
   };
 
   const handleQuantityChange = (ingredientValue, quantity) => {
@@ -83,8 +93,6 @@ const AddRecipeScreen = () => {
       if (!aSelected && bSelected) return 1;
       return a.label.localeCompare(b.label);
     });
-
-
 
   const removeIngredient = (ingredient) => {
     setSelectedIngredients(
@@ -187,9 +195,9 @@ const AddRecipeScreen = () => {
   };
 
   const saveRecipe = async () => {
-    const formattedIngredients = selectedIngredients.map((item) => ({
-      ingredientId: item.value,
-      quantity: ingredientQuantities[item] || "",
+    const formattedIngredients = selectedIngredients.map((itemId) => ({
+      ingredientId: itemId,
+      quantity: ingredientQuantities[itemId] || "",
     }));
 
     const formattedSteps = steps.map((step, index) => ({
@@ -202,19 +210,23 @@ const AddRecipeScreen = () => {
         countryId: selectedCountry,
         categoryId: selectedCategory,
         holidayId: selectedHoliday,
-        typeMealId: selectedTypeMeal
-      }
+        typeMealId: selectedTypeMeal,
+      },
     ];
 
     const recipeData = {
       recipeTitle,
-      time: `${cookTime} минут`,
+      time: `${time} минут`,
       imageLink: null,
       imageLinkPreview: null,
       ingredients: formattedIngredients,
       steps: formattedSteps,
-      attributes
+      attributes,
     };
+
+    console.log('Selected Ingredients:', selectedIngredients);
+    console.log('Formatted Ingredients:', formattedIngredients);
+    console.log('Recipe Data:', recipeData);
 
     try {
       const response = await fetch("http://192.168.88.249:8080/recipe", {
@@ -227,10 +239,10 @@ const AddRecipeScreen = () => {
 
       if (response.ok) {
         const data = await response.json();
-        const recipeId = data.id; // Предполагаем, что ID возвращается в ответе
+        const recipeId = data.recipeId; 
 
-        // Получаем userId из контекста
-        const { userId } = useContext(AuthContext);
+        
+        const userId = user?.userId;
 
         // Создаем данные для второго запроса
         const userRecipeData = {
@@ -252,6 +264,9 @@ const AddRecipeScreen = () => {
 
         if (userRecipeResponse.ok) {
           console.log("Рецепт успешно связан с пользователем");
+          navigation.navigate('Recipe',{
+            recipeId
+          });
         } else {
           console.error("Ошибка при связывании рецепта с пользователем");
         }
@@ -259,6 +274,7 @@ const AddRecipeScreen = () => {
     } catch (error) {
       console.error("Ошибка сохранения рецепта:", error);
     }
+
   };
 
   return (
@@ -379,77 +395,55 @@ const AddRecipeScreen = () => {
           </Modal>
         </View>
 
-        <View
-          style={{
-            marginBottom: 16,
-          }}
-        >
-          <Text style={styles.title}>Категории</Text>
+        <View style={{ marginBottom: 16 }}>
+          <Text style={styles.title}>Категория рецепта</Text>
 
           <TouchableOpacity
             style={styles.selector}
             onPress={() => setCategoriesModalVisible(true)}
           >
             <Text style={styles.selectorText}>
-              {selectedCategories.length > 0
-                ? selectedCategories
-                    .map(
-                      (cat) =>
-                        categories.find((c) => c.value === cat)?.label || cat
-                    )
-                    .join(", ")
-                : "Выберите категории"}
+              {selectedCategory
+                ? categories.find((c) => c.value === selectedCategory)?.label
+                : "Выберите категорию рецепта"}
             </Text>
           </TouchableOpacity>
 
-          {/* Отображение выбранных категорий с возможностью удаления */}
-          {selectedCategories.length > 0 && (
-            <View style={styles.selectedItems}>
-              {selectedCategories.map((category) => (
-                <View key={category} style={styles.selectedItem}>
-                  <Text style={styles.selectedItemText}>
-                    {categories.find((c) => c.value === category)?.label ||
-                      category}
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.removeButton}
-                    onPress={() => removeCategory(category)}
-                  >
-                    <Text style={styles.removeText}>X</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </View>
-          )}
-
           <Modal
-            key="CategoeriesModal"
-            isVisible={isCategoriesModalVisible}
+            isVisible={categoriesModalVisible}
             onBackdropPress={() => setCategoriesModalVisible(false)}
           >
-            <View style={styles.modalContentCategories}>
-              <ScrollView style={styles.categoryList}>
+            <View style={styles.modalContentCountries}>
+              <View style={styles.searchContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Поиск"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </View>
+
+              <ScrollView style={styles.countryList}>
                 {categories
-                  .filter((item) => item.label !== "Мои рецепты")
+                  .filter((item) =>
+                    item.label.toLowerCase().includes(searchQuery.toLowerCase()
+                && item.label !== "Мои рецепты")
+                  )
                   .map((item) => (
                     <TouchableOpacity
                       key={item.value}
-                      style={styles.categoryItem}
+                      style={styles.countryItem}
                       onPress={() => handleCategoryPress(item)}
                     >
-                      <Text style={styles.modalText}>
-                        {item.label}
-                        {selectedCategories.includes(item.value) && " (✓)"}
-                      </Text>
+                      <View style={styles.checkboxContainer}>
+                        <Text style={styles.countryText}>{item.label}</Text>
+                        {selectedCategory === item.value && (
+                          <Text style={styles.checkedText}>(✓)</Text>
+                        )}
+                      </View>
                     </TouchableOpacity>
                   ))}
               </ScrollView>
-              <TouchableOpacity
-                style={styles.doneButton}
-                onPress={() => setCategoriesModalVisible(false)}
-              >
-                <Text style={styles.doneText}>Готово</Text>
-              </TouchableOpacity>
             </View>
           </Modal>
         </View>
@@ -496,6 +490,110 @@ const AddRecipeScreen = () => {
                       <View style={styles.checkboxContainer}>
                         <Text style={styles.countryText}>{item.label}</Text>
                         {selectedCountry === item.value && (
+                          <Text style={styles.checkedText}>(✓)</Text>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
+            </View>
+          </Modal>
+        </View>
+
+        <View style={{ marginBottom: 16 }}>
+          <Text style={styles.title}>Тип приема пищи</Text>
+
+          <TouchableOpacity
+            style={styles.selector}
+            onPress={() => setTypeMealsModalVisible(true)}
+          >
+            <Text style={styles.selectorText}>
+              {selectedTypeMeal
+                ? typeMeals.find((tm) => tm.value === selectedTypeMeal)?.label
+                : "Выберите тип приема пищи"}
+            </Text>
+          </TouchableOpacity>
+
+          <Modal
+            isVisible={typeMealsModalVisible}
+            onBackdropPress={() => setTypeMealsModalVisible(false)}
+          >
+            <View style={styles.modalContentCountries}>
+              <View style={styles.searchContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Поиск"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </View>
+
+              <ScrollView style={styles.countryList}>
+                {typeMeals
+                  .filter((item) =>
+                    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((item) => (
+                    <TouchableOpacity
+                      key={item.value}
+                      style={styles.countryItem}
+                      onPress={() => handleTypeMealPress(item)}
+                    >
+                      <View style={styles.checkboxContainer}>
+                        <Text style={styles.countryText}>{item.label}</Text>
+                        {selectedTypeMeal === item.value && (
+                          <Text style={styles.checkedText}>(✓)</Text>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
+            </View>
+          </Modal>
+        </View>
+
+        <View style={{ marginBottom: 16 }}>
+          <Text style={styles.title}>Праздник</Text>
+
+          <TouchableOpacity
+            style={styles.selector}
+            onPress={() => setHolidaysModalVisible(true)}
+          >
+            <Text style={styles.selectorText}>
+              {selectedHoliday
+                ? holidays.find((h) => h.value === selectedHoliday)?.label
+                : "Выберите праздник, если рецепт к нему относится"}
+            </Text>
+          </TouchableOpacity>
+
+          <Modal
+            isVisible={holidaysModalVisible}
+            onBackdropPress={() => setHolidaysModalVisible(false)}
+          >
+            <View style={styles.modalContentCountries}>
+              <View style={styles.searchContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Поиск"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </View>
+
+              <ScrollView style={styles.countryList}>
+                {holidays
+                  .filter((item) =>
+                    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((item) => (
+                    <TouchableOpacity
+                      key={item.value}
+                      style={styles.countryItem}
+                      onPress={() => handleHolidayPress(item)}
+                    >
+                      <View style={styles.checkboxContainer}>
+                        <Text style={styles.countryText}>{item.label}</Text>
+                        {selectedHoliday === item.value && (
                           <Text style={styles.checkedText}>(✓)</Text>
                         )}
                       </View>
@@ -581,4 +679,4 @@ const AddRecipeScreen = () => {
   );
 };
 
-export default AddRecipeScreen;
+

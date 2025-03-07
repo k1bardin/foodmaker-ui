@@ -14,11 +14,15 @@ export default function RecipeScreen (props) {
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  
+
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
+        console.log('recipeId:', recipeId);
         const response = await fetch(`http://192.168.88.249:8080/recipe/${recipeId}`);
         const data = await response.json();
+        console.log('Получен рецепт:', data);
         setRecipe(data);
       } catch (error) {
         console.error('Ошибка при получении рецепта:', error);
