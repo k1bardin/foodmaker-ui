@@ -1,14 +1,15 @@
 import { StyleSheet } from "react-native";
-import { RecipeCard } from '../../AppStyles';
+import { RecipeCard } from "../../AppStyles";
 
 const styles = StyleSheet.create({
-
-    
-  container: {
-    flex: 1,
-    padding: 16,
+  mainModal: {
+    width: 350,
     backgroundColor: "white",
+    padding: 16,
+    borderRadius: 8,
+    marginTop: 15,
   },
+
   title: {
     fontSize: 18,
     fontWeight: "600",
@@ -59,6 +60,28 @@ const styles = StyleSheet.create({
     backgroundColor: "#F2F2F2",
     opacity: 0.98,
     fontSize: 16,
+  },
+  modalContentIngredients: {
+    flex: 1,
+    maxHeight: "80%",
+    backgroundColor: "white",
+    padding: 16,
+    borderRadius: 8,
+  },
+  modalContentCategories: {
+    flex: 1,
+    maxHeight: "45%",
+    backgroundColor: "white",
+    padding: 16,
+    borderRadius: 8,
+  },
+
+  modalContentCountries: {
+    flex: 1,
+    maxHeight: "45%",
+    backgroundColor: "white",
+    padding: 16,
+    borderRadius: 8,
   },
   input: {
     height: 40,
@@ -165,43 +188,43 @@ const styles = StyleSheet.create({
   selectedItems: {
     marginTop: 16,
     marginBottom: 8,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
   },
-  
+
   selectedItem: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 8,
     marginRight: 12,
     marginBottom: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 
   selectedItemText: {
-    color: '#333',
+    color: "#333",
     fontSize: 12,
-    fontWeight: '500',
-    marginRight: 8
+    fontWeight: "500",
+    marginRight: 8,
   },
 
   removeButton: {
     width: 20,
     height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 12,
-    backgroundColor: '#ff475798'
+    backgroundColor: "#ff475798",
   },
 
   removeText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   container: RecipeCard.container,
   photo: RecipeCard.photo,
@@ -234,31 +257,30 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-    },
-    searchInput: {
-    height: 40,
+    backgroundColor: "#FFFFFF",
+  },
+  searchInput: {
+    height: 56,
+    paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#CCCCCC',
+    borderColor: "rgba(246, 246, 246, 1.0)",
     borderRadius: 8,
-    paddingHorizontal: 16,
-    marginBottom: 16,
+    backgroundColor: "#F2F2F2",
+    opacity: 0.98,
     fontSize: 16,
-    },
+  },
 
-    heartIcon: {
-        position: "absolute",
-        top: 10,
-        right: 10,
-        width: 24,
-        height: 24,
-      },
-      heartImage: {
-        width: "100%",
-        height: "100%",
-      },
+  heartIcon: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    width: 24,
+    height: 24,
+  },
+  heartImage: {
+    width: "100%",
+    height: "100%",
+  },
 });
 
 export default styles;

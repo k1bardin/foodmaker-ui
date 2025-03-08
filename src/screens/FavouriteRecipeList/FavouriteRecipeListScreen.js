@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useState, useEffect } from "react";
+import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   FlatList,
   Text,
@@ -14,14 +15,20 @@ import heartDisabled from "../../../assets/icons/heartDisabled.png";
 import heartEnabled from "../../../assets/icons/heartEnabled.png";
 import { useAuth } from "../../services/AuthContext";
 
-export default function RecipesListScreen(props) {
+export default function FavouriteRecipesListScreen(props) {
   const { user } = useAuth();
-  const { navigation, route } = props;
-
+  const navigation = useNavigation();
   const item = route?.params?.category;
   const [recipesArray, setRecipesArray] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const route = useRoute();
   const [favourites, setFavourites] = useState({});
+
+  const [reloadKey, setReloadKey] = useState(0);
+
+const reloadScreen = () => {
+  setReloadKey(reloadKey + 1);
+};
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -34,9 +41,10 @@ export default function RecipesListScreen(props) {
       const fetchRecipes = async () => {
         try {
           const response = await fetch(
-            `http://192.168.88.249:8080/recipes/findByCategory/${item.categoryId}`
+            `http://192.168.88.249:8080/favouriteRecipes/${user.userId}`
           );
           const data = await response.json();
+          console.log("Получено избранное:", data);
           setRecipesArray(data);
         } catch (error) {
           console.error("Error fetching recipes:", error);
@@ -46,7 +54,11 @@ export default function RecipesListScreen(props) {
       };
 
       fetchRecipes();
-    }, [item.categoryId]);
+    }, [user, reloadKey]);
+
+    useEffect(() => {
+        reloadScreen();
+      }, [route]);
   
 
   useEffect(() => {
@@ -58,6 +70,7 @@ export default function RecipesListScreen(props) {
           );
           const data = await response.json();
           
+          console.log("Получено избранное:", data);
 
           const favouritesObj = data.reduce((acc, favourite) => {
             acc[favourite.recipeId] = true;
@@ -72,9 +85,11 @@ export default function RecipesListScreen(props) {
 
       fetchFavourites();
     }
-  }, [user, recipesArray]);
+  }, [user, recipesArray, reloadKey]);
 
   const onPressRecipe = (item) => {
+    
+    
     navigation.navigate("Recipe", { recipeId: item.recipeId });
   };
 
@@ -103,6 +118,8 @@ export default function RecipesListScreen(props) {
           ...prevFavourites,
           [recipeId]: !isFavourite,
         }));
+        reloadScreen();
+        
       }
     } catch (error) {
       console.error("Error toggling favourite:", error);
@@ -117,7 +134,7 @@ export default function RecipesListScreen(props) {
         underlayColor="rgba(196, 196, 196, 0.9)"
         onPress={() => onPressRecipe(item)}
       >
-        <View style={styles.container}>
+        <View key={reloadKey} style={styles.container}>
           <Image style={styles.photo} source={{ uri: item.imageLinkPreview }} />
           <Text style={styles.title}>{item.recipeTitle}</Text>
 

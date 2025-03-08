@@ -11,6 +11,7 @@ import { Image } from "react-native";
 import LoginScreen from "../Login/LoginScreen";
 import RegisterScreen from "../Register/RegisterScreen";
 import SearchScreen from "../Search/SearchScreen";
+import FavouriteRecipesListScreen from "../FavouriteRecipeList/FavouriteRecipeListScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -74,18 +75,41 @@ function MainStack() {
   );
 }
 
-function SearchStack() {
+function FavouriteStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Search"
-        component={SearchScreen}
+        name="FavouriteRecipesList"
+        component={FavouriteRecipesListScreen}
         options={{
           headerTitle: () => null, // скрываем основной заголовок
           headerTintColor: "#E8B536",
           headerBackTitle: "Назад", // настраиваем текст кнопки назад
           headerBackTitleVisible: true,
         }}
+      />
+
+      <Stack.Screen
+        name="Recipe"
+        component={RecipeScreen}
+        options={{
+          headerTitle: () => null, // скрываем основной заголовок
+          headerTintColor: "#E8B536",
+          headerBackTitle: "Назад", // настраиваем текст кнопки назад
+          headerBackTitleVisible: true,
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function SearchStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Search"
+        component={SearchScreen}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="RecipesList"
@@ -139,6 +163,7 @@ export default function TabContainer() {
     <Tab.Navigator
       initialRouteName="Рецепты"
       screenOptions={({ route }) => ({
+        
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -179,7 +204,7 @@ export default function TabContainer() {
       />
       <Tab.Screen
         name="Избранное"
-        component={MainStack}
+        component={FavouriteStack}
         options={{ headerTitle: () => null }}
       />
       <Tab.Screen
