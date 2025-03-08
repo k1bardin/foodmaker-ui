@@ -45,7 +45,7 @@ export default function CategoriesScreen(props) {
 
   const onPressCategory = (category) => {
     if (category.categoryName === "Мои рецепты" && !user) {
-      navigation.navigate('Profile');
+      navigation.navigate('Профиль');
     } else {
       navigation.navigate('RecipesList', {
         category

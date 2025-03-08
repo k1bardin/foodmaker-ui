@@ -46,7 +46,7 @@ export default function LoginScreen(props) {
             setUser(userData);
 
             console.log('Авторизация успешна');
-            navigation.navigate('Home');
+            navigation.navigate('Рецепты');
         } catch (err) {
             setError(err.message);
         } finally {

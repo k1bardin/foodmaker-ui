@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, ScrollView, Image } from "react-native";
+import { View, Text, TextInput, ScrollView, Image, Platform, KeyboardAvoidingView } from "react-native";
 import Slider from "@react-native-community/slider";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Modal from "react-native-modal";
@@ -278,6 +278,10 @@ export default function AddRecipeScreen (props) {
   };
 
   return (
+    <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      >
     <ScrollView>
       <View
         style={{
@@ -676,6 +680,7 @@ export default function AddRecipeScreen (props) {
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

@@ -6,35 +6,22 @@ import {
   TouchableHighlight,
   Image,
   ActivityIndicator,
-  Button,
-  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import styles from "./styles";
 import plusIcon from "../../../assets/icons/plus.png";
-
-const customButtonStyles = StyleSheet.create({
-  customButton: {
-    width: "100%",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#F2F2F2",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 4,
-  },
-  customButtonText: {
-    color: "#212121",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
+import heartDisabled from "../../../assets/icons/heartDisabled.png";
+import heartEnabled from "../../../assets/icons/heartEnabled.png";
+import { useAuth } from "../../services/AuthContext";
 
 export default function RecipesListScreen(props) {
+  const { user } = useAuth();
   const { navigation, route } = props;
 
   const item = route?.params?.category;
   const [recipesArray, setRecipesArray] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [favourites, setFavourites] = useState({});
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -61,21 +48,89 @@ export default function RecipesListScreen(props) {
     fetchRecipes();
   }, [item.categoryId]);
 
+  useEffect(() => {
+    if (user) {
+      const fetchFavourites = async () => {
+        try {
+          const response = await fetch(
+            `http://192.168.88.249:8080/favouriteRecipes/${user.userId}`
+          );
+          const data = await response.json();
+          console.log('Получено избранное:', data);
+          const favouritesMap = {};
+          data.forEach((recipeId) => {
+            favouritesMap[recipeId] = true;
+          });
+          setFavourites(favouritesMap);
+        } catch (error) {
+          console.error("Error fetching favourites:", error);
+        }
+      };
+
+      fetchFavourites();
+    }
+  }, [user]);
+
   const onPressRecipe = (item) => {
     navigation.navigate("Recipe", { recipeId: item.recipeId });
   };
 
-  const renderRecipes = ({ item }) => (
-    <TouchableHighlight
-      underlayColor="rgba(196, 196, 196, 0.9)"
-      onPress={() => onPressRecipe(item)}
-    >
-      <View style={styles.container}>
-        <Image style={styles.photo} source={{ uri: item.imageLink }} />
-        <Text style={styles.title}>{item.recipeTitle}</Text>
-      </View>
-    </TouchableHighlight>
-  );
+  const toggleFavourite = async (recipeId) => {
+    if (!user) return;
+    const isFavourite = favourites[recipeId];
+    const method = isFavourite ? "DELETE" : "POST";
+
+    try {
+      const response = await fetch(
+        `http://192.168.88.249:8080/user/favouriteRecipe`,
+        {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            recipeId,
+            userId: user.userId,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        setFavourites((prevFavourites) => ({
+          ...prevFavourites,
+          [recipeId]: !isFavourite,
+        }));
+      }
+    } catch (error) {
+      console.error("Error toggling favourite:", error);
+    }
+  };
+
+  const renderRecipes = ({ item }) => {
+    return (
+      <TouchableHighlight
+        underlayColor="rgba(196, 196, 196, 0.9)"
+        onPress={() => onPressRecipe(item)}
+      >
+        <View style={styles.container}>
+          <Image style={styles.photo} source={{ uri: item.imageLinkPreview }} />
+          <Text style={styles.title}>{item.recipeTitle}</Text>
+  
+          {user && (
+            <TouchableOpacity
+              style={styles.heartIcon}
+              onPress={() => toggleFavourite(item.recipeId)}
+            >
+              <Image
+                source={favourites[item.recipeId] ? heartEnabled : heartDisabled}
+                style={styles.heartImage}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+      </TouchableHighlight>
+    );
+  };
 
   if (isLoading) {
     return (

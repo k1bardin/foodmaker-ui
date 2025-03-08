@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     width: '80%',
     alignSelf: 'center',
-    color: '#F6F6F6',
     },
     button: {
     height: 48,
