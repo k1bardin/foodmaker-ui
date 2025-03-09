@@ -3,7 +3,8 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   categoriesItemContainer: {
     flex: 1,
-    margin: 10,
+    marginLeft: 17,
+    marginTop: 17,
     justifyContent: 'center',
     alignItems: 'center',
     height: 107,

@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState, useEffect } from "react";
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   FlatList,
   Text,
@@ -16,19 +16,17 @@ import heartEnabled from "../../../assets/icons/heartEnabled.png";
 import { useAuth } from "../../services/AuthContext";
 
 export default function FavouriteRecipesListScreen(props) {
-  const { user } = useAuth();
   const navigation = useNavigation();
   const item = route?.params?.category;
   const [recipesArray, setRecipesArray] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const route = useRoute();
   const [favourites, setFavourites] = useState({});
-
   const [reloadKey, setReloadKey] = useState(0);
 
-const reloadScreen = () => {
-  setReloadKey(reloadKey + 1);
-};
+  const reloadScreen = () => {
+    setReloadKey(reloadKey + 1);
+  };
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -37,7 +35,19 @@ const reloadScreen = () => {
     });
   }, []);
 
-    useEffect(() => {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) {
+      setIsAuthorized(false);
+      navigation.navigate("Профиль");
+    }
+  }, [user, route, navigation]);
+
+ 
+
+  useEffect(() => {
+    if (user) {
       const fetchRecipes = async () => {
         try {
           const response = await fetch(
@@ -54,12 +64,12 @@ const reloadScreen = () => {
       };
 
       fetchRecipes();
-    }, [user, reloadKey]);
+    }
+  }, [user, reloadKey]);
 
-    useEffect(() => {
-        reloadScreen();
-      }, [route]);
-  
+  useEffect(() => {
+    reloadScreen();
+  }, [route]);
 
   useEffect(() => {
     if (user && recipesArray.length > 0) {
@@ -69,7 +79,7 @@ const reloadScreen = () => {
             `http://192.168.88.249:8080/favouriteRecipes/${user.userId}`
           );
           const data = await response.json();
-          
+
           console.log("Получено избранное:", data);
 
           const favouritesObj = data.reduce((acc, favourite) => {
@@ -88,8 +98,6 @@ const reloadScreen = () => {
   }, [user, recipesArray, reloadKey]);
 
   const onPressRecipe = (item) => {
-    
-    
     navigation.navigate("Recipe", { recipeId: item.recipeId });
   };
 
@@ -119,7 +127,6 @@ const reloadScreen = () => {
           [recipeId]: !isFavourite,
         }));
         reloadScreen();
-        
       }
     } catch (error) {
       console.error("Error toggling favourite:", error);
@@ -163,6 +170,7 @@ const reloadScreen = () => {
       </View>
     );
   }
+
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>

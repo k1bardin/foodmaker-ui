@@ -1,6 +1,6 @@
-import { StyleSheet} from "react-native";
+import { StyleSheet } from "react-native";
 
-const RECIPE_ITEM_MARGIN = 20;
+
 
 // 2 photos per width
 export const RecipeCard = StyleSheet.create({
@@ -8,7 +8,7 @@ export const RecipeCard = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: RECIPE_ITEM_MARGIN,
+    marginLeft: 17,
     marginTop: 20,
     width: 170,
     height: 228,
@@ -16,13 +16,10 @@ export const RecipeCard = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 15,
     overflow: "hidden",
-    backgroundColor: "#E5E5E5"
+    backgroundColor: "#E5E5E5",
   },
   title: {
-    marginLeft:-5,
-    left:10,
-    bottom: 15,
-    position: "absolute", 
+    marginTop: 160,
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 15,
@@ -30,11 +27,9 @@ export const RecipeCard = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     color: "#222222",
-    backgroundColor: "#FFFFFF"
-    
-    
+    backgroundColor: "#FFFFFF",
   },
-  
+
   photo: {
     width: 170,
     height: 228,
@@ -42,7 +37,7 @@ export const RecipeCard = StyleSheet.create({
     position: "absolute", // Фото тоже делаем абсолютным
     top: 0,
     left: 0,
-    
+
     right: 0,
     bottom: 0,
   },
