@@ -1,4 +1,3 @@
-import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -12,6 +11,7 @@ import LoginScreen from "../Login/LoginScreen";
 import RegisterScreen from "../Register/RegisterScreen";
 import SearchScreen from "../Search/SearchScreen";
 import FavouriteRecipesListScreen from "../FavouriteRecipeList/FavouriteRecipeListScreen";
+import AccountScreen from "../Account/AccountScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -137,6 +137,7 @@ function SearchStack() {
 
 // Стек пользовательской авторизации
 function AuthStack() {
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -154,6 +155,11 @@ function AuthStack() {
           headerBackTitleVisible: true,
         }}
       />
+      <Stack.Screen
+        name="Account"
+        component={AccountScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
@@ -163,7 +169,6 @@ export default function TabContainer() {
     <Tab.Navigator
       initialRouteName="Рецепты"
       screenOptions={({ route }) => ({
-        
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -205,7 +210,7 @@ export default function TabContainer() {
       <Tab.Screen
         name="Избранное"
         component={FavouriteStack}
-        options={{ headerTitle: () => null }}
+        options={{ unmountOnBlur: true, headerTitle: () => null }}
       />
       <Tab.Screen
         name="Профиль"

@@ -13,15 +13,22 @@ import plusIcon from "../../../assets/icons/plus.png";
 import heartDisabled from "../../../assets/icons/heartDisabled.png";
 import heartEnabled from "../../../assets/icons/heartEnabled.png";
 import { useAuth } from "../../services/AuthContext";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function RecipesListScreen(props) {
+  const isFocused = useIsFocused();
   const { user } = useAuth();
   const { navigation, route } = props;
 
   const item = route?.params?.category;
   const [recipesArray, setRecipesArray] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [reloadKey, setReloadKey] = useState(0);
   const [favourites, setFavourites] = useState({});
+  const reloadScreen = () => {
+    setReloadKey(reloadKey + 1);
+  };
+
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -30,24 +37,36 @@ export default function RecipesListScreen(props) {
     });
   }, []);
 
-    useEffect(() => {
-      const fetchRecipes = async () => {
-        try {
-          const response = await fetch(
-            `http://192.168.88.249:8080/recipes/findByCategory/${item.categoryId}`
-          );
-          const data = await response.json();
-          setRecipesArray(data);
-        } catch (error) {
-          console.error("Error fetching recipes:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
+  useEffect(() => {
+    reloadScreen();
+  }, [isFocused]);
 
-      fetchRecipes();
-    }, [item.categoryId]);
-  
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        let url;
+
+        // Проверяем название категории
+        if (user && item?.categoryName === "Мои рецепты") {
+          // Для "Мои рецепты" используем endpoint с userId
+          url = `http://192.168.88.249:8080/recipes/${user.userId}`;
+        } else {
+          // Для остальных категорий используем findByCategory
+          url = `http://192.168.88.249:8080/recipes/findByCategory/${item.categoryId}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+        setRecipesArray(data);
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRecipes();
+  }, [item, user, reloadKey]);
 
   useEffect(() => {
     if (user && recipesArray.length > 0) {
@@ -57,7 +76,6 @@ export default function RecipesListScreen(props) {
             `http://192.168.88.249:8080/favouriteRecipes/${user.userId}`
           );
           const data = await response.json();
-          
 
           const favouritesObj = data.reduce((acc, favourite) => {
             acc[favourite.recipeId] = true;
@@ -72,7 +90,7 @@ export default function RecipesListScreen(props) {
 
       fetchFavourites();
     }
-  }, [user, recipesArray]);
+  }, [user, recipesArray, reloadKey]);
 
   const onPressRecipe = (item) => {
     navigation.navigate("Recipe", { recipeId: item.recipeId });
@@ -148,7 +166,7 @@ export default function RecipesListScreen(props) {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
+    <View key={reloadKey} style={{ flex: 1, backgroundColor: "white" }}>
       {item?.categoryName === "Мои рецепты" && (
         <TouchableHighlight
           style={styles.button}
@@ -164,15 +182,30 @@ export default function RecipesListScreen(props) {
           </View>
         </TouchableHighlight>
       )}
-      <FlatList
-        style={{ flex: 1 }}
-        vertical
-        showsVerticalScrollIndicator={false}
-        numColumns={2}
-        data={recipesArray}
-        renderItem={renderRecipes}
-        keyExtractor={(item) => `${item.recipeId}`}
-      />
+      {recipesArray.length > 0 ? (
+        <FlatList
+          style={{ flex: 1 }}
+          vertical
+          showsVerticalScrollIndicator={false}
+          numColumns={2}
+          data={recipesArray}
+          renderItem={renderRecipes}
+          keyExtractor={(item) => `${item.recipeId}`}
+        />
+      ) : (
+        <Text
+          style={{
+            textAlign: "center",
+            marginTop: 220,
+            paddingVertical: 30,
+            fontSize: 18,
+            fontWeight: 600,
+            opacity: 0.5,
+          }}
+        >
+          Здесь пока отсутствуют рецепты
+        </Text>
+      )}
     </View>
   );
 }

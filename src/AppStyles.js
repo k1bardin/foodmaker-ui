@@ -20,14 +20,16 @@ export const RecipeCard = StyleSheet.create({
   },
   title: {
     marginTop: 160,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
     borderRadius: 15,
     fontFamily: "Source Sans Pro",
     fontSize: 12,
     fontWeight: "600",
     color: "#222222",
     backgroundColor: "#FFFFFF",
+    marginRight:60,
+    marginLeft:10
   },
 
   photo: {
@@ -37,7 +39,6 @@ export const RecipeCard = StyleSheet.create({
     position: "absolute", // Фото тоже делаем абсолютным
     top: 0,
     left: 0,
-
     right: 0,
     bottom: 0,
   },

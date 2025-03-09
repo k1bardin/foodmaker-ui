@@ -1,5 +1,9 @@
 import React, { useLayoutEffect, useState, useEffect } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  useIsFocused,
+} from "@react-navigation/native";
 import {
   FlatList,
   Text,
@@ -15,7 +19,8 @@ import heartDisabled from "../../../assets/icons/heartDisabled.png";
 import heartEnabled from "../../../assets/icons/heartEnabled.png";
 import { useAuth } from "../../services/AuthContext";
 
-export default function FavouriteRecipesListScreen(props) {
+export default function FavouriteRecipesListScreen() {
+  const isFocused = useIsFocused();
   const navigation = useNavigation();
   const item = route?.params?.category;
   const [recipesArray, setRecipesArray] = useState([]);
@@ -23,6 +28,7 @@ export default function FavouriteRecipesListScreen(props) {
   const route = useRoute();
   const [favourites, setFavourites] = useState({});
   const [reloadKey, setReloadKey] = useState(0);
+
 
   const reloadScreen = () => {
     setReloadKey(reloadKey + 1);
@@ -38,13 +44,17 @@ export default function FavouriteRecipesListScreen(props) {
   const { user } = useAuth();
 
   useEffect(() => {
+    if (user) {
+      reloadScreen();
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
     if (!user) {
-      setIsAuthorized(false);
+      
       navigation.navigate("Профиль");
     }
-  }, [user, route, navigation]);
-
- 
+  }, [user, route, navigation, reloadKey]);
 
   useEffect(() => {
     if (user) {
@@ -66,10 +76,6 @@ export default function FavouriteRecipesListScreen(props) {
       fetchRecipes();
     }
   }, [user, reloadKey]);
-
-  useEffect(() => {
-    reloadScreen();
-  }, [route]);
 
   useEffect(() => {
     if (user && recipesArray.length > 0) {
@@ -171,7 +177,6 @@ export default function FavouriteRecipesListScreen(props) {
     );
   }
 
-
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       {item?.categoryName === "Мои рецепты" && (
@@ -189,15 +194,30 @@ export default function FavouriteRecipesListScreen(props) {
           </View>
         </TouchableHighlight>
       )}
-      <FlatList
-        style={{ flex: 1 }}
-        vertical
-        showsVerticalScrollIndicator={false}
-        numColumns={2}
-        data={recipesArray}
-        renderItem={renderRecipes}
-        keyExtractor={(item) => `${item.recipeId}`}
-      />
+      {recipesArray.length > 0 ? (
+        <FlatList
+          style={{ flex: 1 }}
+          vertical
+          showsVerticalScrollIndicator={false}
+          numColumns={2}
+          data={recipesArray}
+          renderItem={renderRecipes}
+          keyExtractor={(item) => `${item.recipeId}`}
+        />
+      ) : (
+        <Text
+          style={{
+            textAlign: "center",
+            marginTop: 220,
+            paddingVertical: 30,
+            fontSize: 18,
+            fontWeight: 600,
+            opacity: 0.5,
+          }}
+        >
+          Здесь пока отсутствуют рецепты
+        </Text>
+      )}
     </View>
   );
 }
