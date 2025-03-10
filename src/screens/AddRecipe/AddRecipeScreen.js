@@ -65,6 +65,14 @@ export default function AddRecipeScreen(props) {
           );
           const data = await response.json();
           console.log("Получен рецепт:", data);
+          // Извлекаем этапы из данных
+          const initialSteps = data.steps || [];
+
+          // Форматируем этапы для отображения
+          const formattedSteps = initialSteps.map((step, index) => ({
+            stepNumber: index + 1,
+            stepDescription: step.stepDescription,
+          }));
 
           // Извлекаем ингредиенты из данных
           const initialIngredients = data.ingredients || [];
@@ -92,7 +100,7 @@ export default function AddRecipeScreen(props) {
           setSelectedCountry(countryId || null);
           setSelectedTypeMeal(typeMealId || null);
           setSelectedHoliday(holidayId || null);
-
+          setSteps(formattedSteps);
           setSelectedIngredients(initialSelectedIngredients);
           setIngredientQuantities(initialIngredientQuantities);
           console.log("Название рецепта:", recipeTitle);
