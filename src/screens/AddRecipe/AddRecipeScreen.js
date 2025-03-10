@@ -45,6 +45,69 @@ export default function AddRecipeScreen(props) {
   const [typeMealsModalVisible, setTypeMealsModalVisible] = useState(false);
   const [holidaysModalVisible, setHolidaysModalVisible] = useState(false);
   const [categoriesModalVisible, setCategoriesModalVisible] = useState(false);
+  const [updateMode, setUpdateMode] = useState(false);
+  const [recipe, setRecipe] = useState(null);
+  const { recipeId } = route.params || {};
+
+  // Устанавливаем updateMode в зависимости от наличия recipeId
+  useEffect(() => {
+    setUpdateMode(!!recipeId);
+  }, [recipeId]);
+
+  // Выполняем запрос только если есть recipeId
+  useEffect(() => {
+    if (recipeId) {
+      const fetchRecipe = async () => {
+        try {
+          console.log("recipeId:", recipeId);
+          const response = await fetch(
+            `http://192.168.88.249:8080/recipe/${recipeId}`
+          );
+          const data = await response.json();
+          console.log("Получен рецепт:", data);
+
+          // Извлекаем ингредиенты из данных
+          const initialIngredients = data.ingredients || [];
+
+          // Создаем маппинг значений для предзаполнения
+          const initialSelectedIngredients = initialIngredients.map(
+            (ingredient) => ingredient.ingredientId
+          );
+          const initialIngredientQuantities = initialIngredients.reduce(
+            (acc, ingredient) => {
+              acc[ingredient.ingredientId] = ingredient.quantity;
+              return acc;
+            },
+            {}
+          );
+          const extractedTime = data.time ? data.time.match(/\d+/) : "";
+          setRecipe(data);
+          setRecipeTitle(data.recipeTitle || "");
+          setTime(extractedTime ? extractedTime[0] : "");
+          const categoryId = data.attributes[0]?.categoryId;
+          const countryId = data.attributes[0]?.countryId;
+          const typeMealId = data.attributes[0]?.typeMealId;
+          const holidayId = data.attributes[0]?.holidayId;
+          setSelectedCategory(categoryId || null);
+          setSelectedCountry(countryId || null);
+          setSelectedTypeMeal(typeMealId || null);
+          setSelectedHoliday(holidayId || null);
+
+          setSelectedIngredients(initialSelectedIngredients);
+          setIngredientQuantities(initialIngredientQuantities);
+          console.log("Название рецепта:", recipeTitle);
+        } catch (error) {
+          console.error("Ошибка при получении рецепта:", error);
+        }
+      };
+
+      fetchRecipe();
+    }
+  }, [recipeId]);
+
+  useEffect(() => {
+    console.log("Название рецепта:", recipeTitle);
+  }, [recipeTitle]);
 
   const handleCategoryPress = (item) => {
     setCategoriesModalVisible(false);
@@ -222,6 +285,7 @@ export default function AddRecipeScreen(props) {
     ];
 
     const recipeData = {
+      recipeId,
       recipeTitle,
       time: `${time} минут`,
       imageLink: null,
@@ -236,13 +300,21 @@ export default function AddRecipeScreen(props) {
     console.log("Recipe Data:", recipeData);
 
     try {
-      const response = await fetch("http://192.168.88.249:8080/recipe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(recipeData),
-      });
+      const response = updateMode
+        ? await fetch("http://192.168.88.249:8080/recipe", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(recipeData),
+          })
+        : await fetch("http://192.168.88.249:8080/recipe", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(recipeData),
+          });
 
       if (response.ok) {
         const data = await response.json();
@@ -304,13 +376,13 @@ export default function AddRecipeScreen(props) {
             style={styles.input}
           />
           <View
-                    style={{
-                      position: "absolute",
-                      left: 16,
-                      top: "50%",
-                      transform: [{ translateY: -10 }],
-                    }}
-                  ></View>
+            style={{
+              position: "absolute",
+              left: 16,
+              top: "50%",
+              transform: [{ translateY: -10 }],
+            }}
+          ></View>
 
           <Text style={styles.title}>Время приготовления</Text>
           <View
@@ -451,17 +523,19 @@ export default function AddRecipeScreen(props) {
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                   />
-                  <View style={{
-                        position: 'absolute',
-                        left: 16,
-                        top: '50%',
-                        transform: [{ translateY: -10 }]
-                      }}>
-                        <Image
-                          source={searchInput}
-                          style={{ width: 20, height: 20 }}
-                        />
-                      </View>
+                  <View
+                    style={{
+                      position: "absolute",
+                      left: 16,
+                      top: "50%",
+                      transform: [{ translateY: -10 }],
+                    }}
+                  >
+                    <Image
+                      source={searchInput}
+                      style={{ width: 20, height: 20 }}
+                    />
+                  </View>
                 </View>
 
                 <ScrollView style={styles.countryList}>
@@ -586,17 +660,19 @@ export default function AddRecipeScreen(props) {
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                   />
-                  <View style={{
-                        position: 'absolute',
-                        left: 16,
-                        top: '50%',
-                        transform: [{ translateY: -10 }]
-                      }}>
-                        <Image
-                          source={searchInput}
-                          style={{ width: 20, height: 20 }}
-                        />
-                      </View>
+                  <View
+                    style={{
+                      position: "absolute",
+                      left: 16,
+                      top: "50%",
+                      transform: [{ translateY: -10 }],
+                    }}
+                  >
+                    <Image
+                      source={searchInput}
+                      style={{ width: 20, height: 20 }}
+                    />
+                  </View>
                 </View>
 
                 <ScrollView style={styles.countryList}>
@@ -651,17 +727,19 @@ export default function AddRecipeScreen(props) {
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                   />
-                  <View style={{
-                        position: 'absolute',
-                        left: 16,
-                        top: '50%',
-                        transform: [{ translateY: -10 }]
-                      }}>
-                        <Image
-                          source={searchInput}
-                          style={{ width: 20, height: 20 }}
-                        />
-                      </View>
+                  <View
+                    style={{
+                      position: "absolute",
+                      left: 16,
+                      top: "50%",
+                      transform: [{ translateY: -10 }],
+                    }}
+                  >
+                    <Image
+                      source={searchInput}
+                      style={{ width: 20, height: 20 }}
+                    />
+                  </View>
                 </View>
 
                 <ScrollView style={styles.countryList}>

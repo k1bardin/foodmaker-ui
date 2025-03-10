@@ -93,7 +93,7 @@ export default function AccountScreen(props) {
 
       <View style={styles.profileItem}>
         <Text style={styles.label}>Тип пользователя</Text>
-        <Text style={styles.value}>{profileData.typeName}</Text>
+        <Text style={styles.value}>{profileData.roleId === 1 ? "Администратор" : profileData.typeName}</Text>
       </View>
       <TouchableOpacity style={styles.recipesButton} onPress={handleMyRecipes}>
         <Text style={styles.recipesText}>Мои рецепты</Text>

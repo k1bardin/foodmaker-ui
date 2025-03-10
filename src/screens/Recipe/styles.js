@@ -15,6 +15,41 @@ const styles = StyleSheet.create({
     flexDirection: "row", // Располагаем элементы в ряд
     alignItems: "center", // Выравниваем по центру вертикально
   },
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: -15,
+    padding: 10,
+    marginBottom:20
+  },
+  editButton: {
+    backgroundColor: "#235427",
+    borderRadius: 32,
+    padding: 10,
+    marginRight: 10,
+  },
+  editText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+    paddingVertical: 5,
+    paddingHorizontal: 24,
+  },
+  deleteText: {
+    color: '#222222B2',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+    paddingVertical: 5,
+    paddingHorizontal: 24,
+  },
+  deleteButton: {
+    backgroundColor: '#D8E593CC',
+    borderRadius: 32,
+    padding: 10,
+    
+  },
   header: {
     alignItems: "center",
     marginBottom: 4,

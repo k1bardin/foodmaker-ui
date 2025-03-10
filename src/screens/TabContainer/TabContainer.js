@@ -99,6 +99,16 @@ function FavouriteStack() {
           headerBackTitleVisible: true,
         }}
       />
+      <Stack.Screen
+        name="AddRecipe"
+        component={AddRecipeScreen}
+        options={{
+          headerTitle: () => null, // скрываем основной заголовок
+          headerTintColor: "#E8B536",
+          headerBackTitle: "Назад", // настраиваем текст кнопки назад
+          headerBackTitleVisible: true,
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -124,6 +134,16 @@ function SearchStack() {
       <Stack.Screen
         name="Recipe"
         component={RecipeScreen}
+        options={{
+          headerTitle: () => null, // скрываем основной заголовок
+          headerTintColor: "#E8B536",
+          headerBackTitle: "Назад", // настраиваем текст кнопки назад
+          headerBackTitleVisible: true,
+        }}
+      />
+      <Stack.Screen
+        name="AddRecipe"
+        component={AddRecipeScreen}
         options={{
           headerTitle: () => null, // скрываем основной заголовок
           headerTintColor: "#E8B536",

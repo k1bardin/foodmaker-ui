@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, ScrollView, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import styles from "./styles";
 import { useAuth } from "../../services/AuthContext";
 
@@ -48,6 +55,47 @@ export default function RecipeScreen(props) {
 
     fetchRecipe();
   }, [recipeId]);
+
+  const canEdit =
+    user &&
+    Array.isArray(userRecipe) &&
+    (user.roleId === 1 ||
+      (user.roleId === 2 && user.userId === userRecipe[0]?.userId));
+
+  // Добавляем логирование с дополнительными проверками
+  console.log("Проверка прав на редактирование:");
+  console.log("Пользователь:", user || "не определен");
+  console.log("Роль пользователя:", user ? user.roleId : "не определена");
+  console.log("ID пользователя:", user ? user.userId : "не определен");
+  console.log("Массив userRecipe:", userRecipe || "не определен");
+  console.log(
+    "ID автора рецепта:",
+    userRecipe && userRecipe[0] ? userRecipe[0].userId : "не определен"
+  );
+  console.log("Результат проверки canEdit:", canEdit);
+
+  // Возвращаем значение canEdit
+  //return canEdit;
+
+  const handleDelete = async () => {
+    try {
+      const deleteRecipe = async () => {
+        const response = await fetch(
+          `http://192.168.88.249:8080/recipe/${recipeId}`,
+          { method: "DELETE" }
+        );
+        return response.ok;
+      };
+
+      const recipeDeleted = await deleteRecipe();
+
+      if (recipeDeleted) {
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.error("Ошибка при удалении рецепта:", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -128,6 +176,27 @@ export default function RecipeScreen(props) {
           ))}
         </ScrollView>
       </View>
+
+      {!user ? null : (
+        <View style={styles.actionButtons}>
+          {canEdit && (
+            <>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => navigation.navigate("AddRecipe", { recipeId })}
+              >
+                <Text style={styles.editText}>Редактировать</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={handleDelete}
+              >
+                <Text style={styles.deleteText}>Удалить</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      )}
     </ScrollView>
   );
 }

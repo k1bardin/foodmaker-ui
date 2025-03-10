@@ -29,7 +29,6 @@ export default function FavouriteRecipesListScreen() {
   const [favourites, setFavourites] = useState({});
   const [reloadKey, setReloadKey] = useState(0);
 
-
   const reloadScreen = () => {
     setReloadKey(reloadKey + 1);
   };
@@ -51,7 +50,6 @@ export default function FavouriteRecipesListScreen() {
 
   useEffect(() => {
     if (!user) {
-      
       navigation.navigate("Профиль");
     }
   }, [user, route, navigation, reloadKey]);
@@ -64,7 +62,7 @@ export default function FavouriteRecipesListScreen() {
             `http://192.168.88.249:8080/favouriteRecipes/${user.userId}`
           );
           const data = await response.json();
-          console.log("Получено избранное:", data);
+
           setRecipesArray(data);
         } catch (error) {
           console.error("Error fetching recipes:", error);
@@ -85,8 +83,6 @@ export default function FavouriteRecipesListScreen() {
             `http://192.168.88.249:8080/favouriteRecipes/${user.userId}`
           );
           const data = await response.json();
-
-          console.log("Получено избранное:", data);
 
           const favouritesObj = data.reduce((acc, favourite) => {
             acc[favourite.recipeId] = true;
@@ -140,8 +136,6 @@ export default function FavouriteRecipesListScreen() {
   };
 
   const renderRecipes = ({ item }) => {
-    const isFavourite = favourites[item.recipeId] || false;
-    console.log(`Recipe ${item.recipeId} is favourite: ${isFavourite}`);
     return (
       <TouchableHighlight
         underlayColor="rgba(196, 196, 196, 0.9)"

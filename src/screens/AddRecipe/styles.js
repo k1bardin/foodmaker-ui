@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
   },
   selectorText: {
     fontSize: 16,
-    opacity: 0.22,
+    opacity: 0.8,
   },
   modalContentIngredients: {
     flex: 1,

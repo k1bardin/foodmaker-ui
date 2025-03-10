@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   logoutText: {
-    color: "#22222270",
+    color: "#222222B2",
     fontSize: 18,
     fontWeight: "600",
   },

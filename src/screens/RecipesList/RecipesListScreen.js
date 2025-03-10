@@ -128,8 +128,6 @@ export default function RecipesListScreen(props) {
   };
 
   const renderRecipes = ({ item }) => {
-    const isFavourite = favourites[item.recipeId] || false;
-    console.log(`Recipe ${item.recipeId} is favourite: ${isFavourite}`);
     return (
       <TouchableHighlight
         underlayColor="rgba(196, 196, 196, 0.9)"
